@@ -21,7 +21,7 @@ func  handleClient(conn net.Conn){
 	fmt.Println("Received data",string(buf[:n]))
 
 
-	message := []byte("Hello , Client!")
+	message := []byte("+Hello, Client!\r\n")
 	n,err = conn.Write(message)
 
 	if err != nil{
