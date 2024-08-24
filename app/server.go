@@ -42,7 +42,7 @@ func main() {
 		os.Exit(1)
 	}
 	// ensure to stop the tcp server when the program exits
-	defer listener.close()
+	defer listener.Close()
 
 	fmt.Println("Server is listening on port 6379")
 	for {
