@@ -47,7 +47,7 @@ func main() {
 	fmt.Println("Server is listening on port 6379")
 	for {
 		// Block until we receive an incoming connection
-		conn, err = listener.Accept()
+		conn, err := listener.Accept()
 		if err != nil {
 			fmt.Println("Error accepting connection: ", err.Error())
 			os.Exit(1)
