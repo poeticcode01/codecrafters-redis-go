@@ -8,7 +8,7 @@ import (
 
 func  handleClient(conn net.Conn){
 	// ensure we close the connection after we're done
-	defer conn.Close()
+	// defer conn.Close()
 
 	// Read data
 	buf := make([]byte,1024)
@@ -45,16 +45,17 @@ func main() {
 	defer listener.Close()
 
 	fmt.Println("Server is listening on port 6379")
+	conn, err := listener.Accept()
 	for {
 		// Block until we receive an incoming connection
-		conn, err := listener.Accept()
+		
 		if err != nil {
 			fmt.Println("Error accepting connection: ", err.Error())
 			os.Exit(1)
 
 		}
 		// Hnadle client connection
-		handleClient(conn)
+		go handleClient(conn)
 
 		
 	}
