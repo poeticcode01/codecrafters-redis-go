@@ -8,27 +8,31 @@ import (
 
 func  handleClient(conn net.Conn){
 	// ensure we close the connection after we're done
-	// defer conn.Close()
+	defer conn.Close()
 
 	// Read data
-	buf := make([]byte,1024)
-	n,err := conn.Read(buf)
+	for {
+		buf := make([]byte,1024)
+		n,err := conn.Read(buf)
 
-	if err != nil{
-		fmt.Println("Error reading data from  the client",err.Error())
-		return
+		if err != nil{
+			fmt.Println("Error reading data from  the client",err.Error())
+			return
+		}
+		fmt.Println("Received data",string(buf[:n]))
+
+
+		message := []byte("+PONG\r\n")
+		n,err = conn.Write(message)
+
+		if err != nil{
+			fmt.Println("Error sending message to the  client",err.Error())
+			return
+		}
+		fmt.Printf("send %d bytes",n)
+
 	}
-	fmt.Println("Received data",string(buf[:n]))
-
-
-	message := []byte("+PONG\r\n")
-	n,err = conn.Write(message)
-
-	if err != nil{
-		fmt.Println("Error sending message to the  client",err.Error())
-		return
-	}
-	fmt.Printf("send %d bytes",n)
+	
 
 
 
@@ -45,10 +49,11 @@ func main() {
 	defer listener.Close()
 
 	fmt.Println("Server is listening on port 6379")
-	conn, err := listener.Accept()
+	// Block until we receive an incoming connection
+	
 	for {
-		// Block until we receive an incoming connection
 		
+		conn, err := listener.Accept()
 		if err != nil {
 			fmt.Println("Error accepting connection: ", err.Error())
 			os.Exit(1)
