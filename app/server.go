@@ -21,14 +21,14 @@ func  handleClient(conn net.Conn){
 	fmt.Println("Received data",string(buf[:n]))
 
 
-	message := []byte("Hello , server!")
-	n,err := conn.Write(message)
+	message := []byte("Hello , Client!")
+	n,err = conn.Write(message)
 
 	if err != nil{
-		fmt.Println("Error sneding message to the  client",err.Error())
+		fmt.Println("Error sending message to the  client",err.Error())
 		return
 	}
-	fmt.Println("send %d bytes",n)
+	fmt.Printf("send %d bytes",n)
 
 
 
