@@ -58,7 +58,7 @@ func main() {
 	server_port := fmt.Sprintf("0.0.0.0:%s", *port)
 
 	if *replicaof != "master" {
-		commands.DEFAULT = "slave"
+		commands.DEFAULTROLE = "slave"
 
 	}
 

@@ -12,7 +12,9 @@ const (
 	ClrfDelimeter = "\r\n"
 )
 
-var DEFAULT string = "master"
+var DEFAULTROLE string = "master"
+var MASTER_REPLID string = "8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb"
+var MASTER_REPL_OFFSET int = 0
 
 func clrfSplit(str string) []string {
 	command_slice := strings.Split(str, ClrfDelimeter)
@@ -63,7 +65,7 @@ func (*Info) Run(input []string) (string, error) {
 }
 
 func replication() (string, error) {
-	content := fmt.Sprintf("role:%s", DEFAULT)
+	content := fmt.Sprintf("role:%s\nmaster_replid:%s\nmaster_repl_offset:%d", DEFAULTROLE, MASTER_REPLID, MASTER_REPL_OFFSET)
 	var respType Type = &BulkString{Content: &content}
 	return respType.Encode(), nil
 
