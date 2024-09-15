@@ -49,12 +49,18 @@ func handleClient(conn net.Conn) {
 }
 
 func main() {
-	port := flag.String("port", "6379", "a string")
+	port := flag.String("port", "6379", "server port")
+	replicaof := flag.String("replicaof", "master", "decalre server as slave or master")
 
 	// Parse the flags
 	flag.Parse()
 
 	server_port := fmt.Sprintf("0.0.0.0:%s", *port)
+
+	if *replicaof != "master" {
+		commands.DEFAULT = "slave"
+
+	}
 
 	// listener, err := net.Listen("tcp", "0.0.0.0:6379")
 	listener, err := net.Listen("tcp", server_port)
