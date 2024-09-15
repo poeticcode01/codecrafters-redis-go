@@ -38,10 +38,32 @@ func Execute(input_buf string) (string, error) {
 		cmd = &Set{}
 	case "get":
 		cmd = &Get{}
-
+	case "info":
+		cmd = &Info{}
 	}
 
 	return (cmd).Run(command_slice[1:])
+
+}
+
+type Info struct{}
+
+func (*Info) Run(input []string) (string, error) {
+	info_argument := strings.ToLower(input[0])
+	var resp string = ""
+
+	switch info_argument {
+	case "replication":
+		return replication()
+
+	}
+	return resp, nil
+}
+
+func replication() (string, error) {
+	content := "role:master"
+	var respType Type = &BulkString{Content: &content}
+	return respType.Encode(), nil
 
 }
 
@@ -66,9 +88,6 @@ func (*Ping) Run(_ []string) (string, error) {
 	return respType.Encode(), nil
 }
 
-type Type interface {
-	Encode() string
-}
 type Set struct{}
 
 func (*Set) Run(data_slice []string) (string, error) {
@@ -108,6 +127,10 @@ func (*Get) Run(data_slice []string) (string, error) {
 	bulk := &BulkString{Content: &return_val}
 	return bulk.Encode(), nil
 
+}
+
+type Type interface {
+	Encode() string
 }
 
 type BulkString struct {
