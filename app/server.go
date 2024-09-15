@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"net"
 	"os"
@@ -48,8 +49,15 @@ func handleClient(conn net.Conn) {
 }
 
 func main() {
+	port := flag.String("port", "6379", "a string")
 
-	listener, err := net.Listen("tcp", "0.0.0.0:6379")
+	// Parse the flags
+	flag.Parse()
+
+	server_port := fmt.Sprintf("0.0.0.0:%s", *port)
+
+	// listener, err := net.Listen("tcp", "0.0.0.0:6379")
+	listener, err := net.Listen("tcp", server_port)
 	if err != nil {
 		fmt.Println("Failed to bind to port 6379")
 		os.Exit(1)
