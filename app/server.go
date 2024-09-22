@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"strings"
 
 	"github.com/codecrafters-io/redis-starter-go/app/commands"
 )
@@ -48,6 +49,29 @@ func handleClient(conn net.Conn) {
 
 }
 
+func HandShake(master_host string, master_port string) {
+
+	conn, err := net.Dial("tcp", fmt.Sprintf("%s:%s", master_host, master_port))
+	if err != nil {
+		fmt.Println("Error in handshaking:", err)
+		os.Exit(1)
+	}
+	defer conn.Close()
+	meassge := "PING"
+	bulk_message, _ := commands.CreateMessage(meassge)
+	// fmt.Println("Bulk message is :", bulk_message)
+
+	_, err = conn.Write([]byte(bulk_message))
+	if err != nil {
+		fmt.Println("Error sending message over Handshake:", err)
+		os.Exit(1)
+
+	}
+
+	fmt.Println("Successfully HandShake done and Message sent")
+
+}
+
 func main() {
 	port := flag.String("port", "6379", "server port")
 	replicaof := flag.String("replicaof", "master", "decalre server as slave or master")
@@ -59,6 +83,11 @@ func main() {
 
 	if *replicaof != "master" {
 		commands.DEFAULTROLE = "slave"
+		master_info := strings.Split(*replicaof, " ")
+		master_host := master_info[0]
+		master_port := master_info[1]
+		fmt.Println("Master info", master_host, master_port)
+		go HandShake(master_host, master_port)
 
 	}
 
@@ -71,7 +100,7 @@ func main() {
 	// ensure to stop the tcp server when the program exits
 	defer listener.Close()
 
-	fmt.Println("Server is listening on port 6379")
+	fmt.Println("Server is listening on port:", *port)
 	// Block until we receive an incoming connection
 
 	for {

@@ -85,6 +85,13 @@ func (*Echo) Run(input []string) (string, error) {
 	return EncodeArray(arr), nil
 }
 
+func CreateMessage(message string) (string, error) {
+	arr := make([]*BulkString, 0, 1)
+	arr = append(arr, &BulkString{Content: &message})
+	// fmt.Println(fmt.Sprintf("message %v", *arr[0]))
+	return EncodeArray(arr), nil
+}
+
 type Ping struct{}
 
 func (*Ping) Run(_ []string) (string, error) {
@@ -155,10 +162,20 @@ func EncodeArray[T Type](arr []T) string {
 	length := len(arr)
 	arrMark := fmt.Sprintf("*%d%s", length, ClrfDelimeter)
 	buf := bytes.NewBuffer([]byte(arrMark))
-	for _, v := range arr {
-		encoded := fmt.Sprintf("%v%s", v.Encode(), ClrfDelimeter)
-		buf.WriteString(encoded)
+	if length > 1 {
+		for _, v := range arr {
+			encoded := fmt.Sprintf("%v%s", v.Encode(), ClrfDelimeter)
+			buf.WriteString(encoded)
+		}
+
+	} else {
+		for _, v := range arr {
+			encoded := fmt.Sprintf("%v", v.Encode())
+			buf.WriteString(encoded)
+		}
+
 	}
+
 	return buf.String()
 }
 
