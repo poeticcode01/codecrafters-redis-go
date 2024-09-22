@@ -44,6 +44,8 @@ func Execute(input_buf string) (string, error) {
 		cmd = &Get{}
 	case "info":
 		cmd = &Info{}
+	case "replconf":
+		cmd = &ReplConf{}
 	}
 
 	return (cmd).Run(command_slice[1:])
@@ -51,6 +53,27 @@ func Execute(input_buf string) (string, error) {
 }
 
 type Info struct{}
+type Echo struct{}
+type Ping struct{}
+type Set struct{}
+type Get struct{}
+type ReplConf struct{}
+type Type interface {
+	Encode() string
+}
+type SimpleString struct {
+	Content string
+}
+
+type BulkString struct {
+	Content *string
+}
+
+func (*ReplConf) Run(input []string) (string, error) {
+	var respType Type = &SimpleString{Content: "OK"}
+	return respType.Encode(), nil
+
+}
 
 func (*Info) Run(input []string) (string, error) {
 	info_argument := strings.ToLower(input[0])
@@ -70,8 +93,6 @@ func replication() (string, error) {
 	return respType.Encode(), nil
 
 }
-
-type Echo struct{}
 
 func (*Echo) Run(input []string) (string, error) {
 	if len(input) == 1 {
@@ -96,14 +117,10 @@ func CreateMessage(message_list []string) (string, error) {
 	return EncodeArray(arr, false), nil
 }
 
-type Ping struct{}
-
 func (*Ping) Run(_ []string) (string, error) {
 	var respType Type = &SimpleString{Content: "PONG"}
 	return respType.Encode(), nil
 }
-
-type Set struct{}
 
 func (*Set) Run(data_slice []string) (string, error) {
 	fmt.Println("Data slice is ", data_slice)
@@ -125,8 +142,6 @@ func (*Set) Run(data_slice []string) (string, error) {
 
 }
 
-type Get struct{}
-
 func (*Get) Run(data_slice []string) (string, error) {
 	key := data_slice[0]
 	cache := hashtable.GetCache()
@@ -142,14 +157,6 @@ func (*Get) Run(data_slice []string) (string, error) {
 	bulk := &BulkString{Content: &return_val}
 	return bulk.Encode(), nil
 
-}
-
-type Type interface {
-	Encode() string
-}
-
-type BulkString struct {
-	Content *string
 }
 
 func (t *BulkString) Encode() string {
@@ -181,10 +188,6 @@ func EncodeArray[T Type](arr []T, extra bool) string {
 	}
 
 	return buf.String()
-}
-
-type SimpleString struct {
-	Content string
 }
 
 func (t *SimpleString) Encode() string {
