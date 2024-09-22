@@ -46,6 +46,8 @@ func Execute(input_buf string) (string, error) {
 		cmd = &Info{}
 	case "replconf":
 		cmd = &ReplConf{}
+	case "psync":
+		cmd = &Psync{}
 	}
 
 	return (cmd).Run(command_slice[1:])
@@ -58,6 +60,8 @@ type Ping struct{}
 type Set struct{}
 type Get struct{}
 type ReplConf struct{}
+type Psync struct{}
+
 type Type interface {
 	Encode() string
 }
@@ -67,6 +71,12 @@ type SimpleString struct {
 
 type BulkString struct {
 	Content *string
+}
+
+func (*Psync) Run(input []string) (string, error) {
+	var respType Type = &SimpleString{Content: fmt.Sprintf("FULLRESYNC %s %d", MASTER_REPLID, MASTER_REPL_OFFSET)}
+	return respType.Encode(), nil
+
 }
 
 func (*ReplConf) Run(input []string) (string, error) {
