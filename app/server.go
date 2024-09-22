@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
 	"net"
@@ -49,7 +50,7 @@ func handleClient(conn net.Conn) {
 
 }
 
-func HandShake(master_host string, master_port string) {
+func HandShake(master_host string, master_port string, listening_port string) {
 
 	conn, err := net.Dial("tcp", fmt.Sprintf("%s:%s", master_host, master_port))
 	if err != nil {
@@ -57,14 +58,34 @@ func HandShake(master_host string, master_port string) {
 		os.Exit(1)
 	}
 	defer conn.Close()
-	meassge := "PING"
-	bulk_message, _ := commands.CreateMessage(meassge)
-	// fmt.Println("Bulk message is :", bulk_message)
 
-	_, err = conn.Write([]byte(bulk_message))
-	if err != nil {
-		fmt.Println("Error sending message over Handshake:", err)
-		os.Exit(1)
+	message_slice := [][]string{{"PING"},
+		{"REPLCONF", "listening-port", listening_port},
+		{"REPLCONF", "capa", "psync2"},
+	}
+
+	for _, message := range message_slice {
+
+		bulk_message, _ := commands.CreateMessage(message)
+		// fmt.Println("Bulk message is :", bulk_message)
+
+		_, err = conn.Write([]byte(bulk_message))
+		if err != nil {
+			fmt.Println("Error sending message over Handshake:", err)
+			os.Exit(1)
+
+		}
+		fmt.Println("Sent message:", message)
+
+		// Wait for the server's response
+		response, err := bufio.NewReader(conn).ReadString('\n')
+		if err != nil {
+			fmt.Println("Error receiving response:", err)
+			return
+		}
+
+		// Print the server's response
+		fmt.Println("Server response:", response)
 
 	}
 
@@ -87,7 +108,7 @@ func main() {
 		master_host := master_info[0]
 		master_port := master_info[1]
 		fmt.Println("Master info", master_host, master_port)
-		go HandShake(master_host, master_port)
+		go HandShake(master_host, master_port, *port)
 
 	}
 
