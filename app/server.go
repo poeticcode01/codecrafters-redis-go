@@ -62,6 +62,7 @@ func HandShake(master_host string, master_port string, listening_port string) {
 	message_slice := [][]string{{"PING"},
 		{"REPLCONF", "listening-port", listening_port},
 		{"REPLCONF", "capa", "psync2"},
+		{"PSYNC", "?", "-1"},
 	}
 
 	for _, message := range message_slice {
