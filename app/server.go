@@ -44,10 +44,28 @@ func handleClient(conn net.Conn) {
 			fmt.Println("Error sending message to the  client", err.Error())
 			return
 		}
+		handle_psync(input_buf, conn)
 		// fmt.Printf("send %d bytes", n)
 
 	}
 
+}
+
+func handle_psync(input_buf string, conn net.Conn) {
+	command_slice := commands.Decode(input_buf)
+	fmt.Println("Command slice is  ", command_slice)
+
+	name := strings.ToLower(command_slice[0])
+	if name == "psync" {
+		sync_data := "$87\r\nREDIS0011\xfa\tredis-ver\x057.2.0\xfa\nredis-bits\xc0@\xfa\x05ctime\xc2m\x08\xbce\xfa\x08used-mem\xc2\xb0\xc4\x10\x00\xfa\x08aof-base\xc0\x00\xff\xf0n;\xfe\xc0\xffZ"
+		_, err := conn.Write([]byte(sync_data))
+		fmt.Println("Sent empty RDB file")
+		if err != nil {
+			fmt.Println("Error sending empty RDB to the client  ", err.Error())
+			return
+		}
+
+	}
 }
 
 func HandShake(master_host string, master_port string, listening_port string) {
