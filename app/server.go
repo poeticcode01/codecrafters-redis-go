@@ -91,6 +91,7 @@ func SyncWithMaster(conn net.Conn) {
 		fmt.Println("lenght of sync command is ", split_len)
 		fmt.Println("sync comand Split input is", split)
 		if split_len < 7 {
+			fmt.Println("Received commands not suppoted yet")
 			continue
 		}
 		command_slice := []string{}
