@@ -77,14 +77,14 @@ func SyncWithMaster(conn net.Conn) {
 
 	for {
 		buf := make([]byte, 1024)
-		_, err := conn.Read(buf)
+		n, err := conn.Read(buf)
 
 		if err != nil {
 			fmt.Println("Error reading data from  the master", err.Error())
 			return
 		}
 
-		input_buf := string(buf)
+		input_buf := string(buf[:n])
 		fmt.Println("Received sync commands from master", input_buf)
 		split := strings.Split(input_buf, ClrfDelimeter)
 		split_len := len(split)
@@ -114,6 +114,24 @@ func SyncWithMaster(conn net.Conn) {
 				fmt.Println("Error executing command: ", err.Error())
 			}
 			fmt.Println("Executed sync command", sync_command)
+
+			temp_slice := commands.Decode(sync_command)
+			name := strings.ToLower(temp_slice[0])
+			fmt.Println("Replication command from master", name)
+			if name == "replconf" {
+				fmt.Println("Handle ACK")
+				// *3\r\n$8\r\nREPLCONF\r\n$3\r\nACK\r\n$1\r\n0\r\n.
+				message_slice := []string{"REPLCONF", "ACK", "0"}
+				output, _ := commands.CreateMessage(message_slice)
+				_, err = conn.Write([]byte(output))
+
+				if err != nil {
+					fmt.Println("Error sending ACK message to the  Master", err.Error())
+					return
+				}
+				fmt.Println("Succesfully sent ACK")
+
+			}
 
 		}
 
