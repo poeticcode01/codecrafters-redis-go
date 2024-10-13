@@ -191,8 +191,15 @@ func SyncWithMaster(conn net.Conn) {
 			if name == PingCommand {
 				byte_read_so_far += 14
 
+			} else if name == ReplconfCommand {
+				byte_read_so_far += 37
 			} else {
-				byte_read_so_far += len(sync_command) + 6
+
+				fmt.Println("Temp slice is  ", temp_slice)
+				output, _ := commands.CreateMessage(temp_slice)
+				fmt.Println("Resp len for set command is ", len(output))
+				byte_read_so_far += len(output)
+
 			}
 
 			fmt.Println("Updated byte length is", byte_read_so_far)
