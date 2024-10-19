@@ -82,7 +82,7 @@ func SyncWithMaster(conn net.Conn) {
 
 		if err != nil {
 			fmt.Println("Error reading data from  the master", err.Error())
-			continue
+			return
 		}
 
 		input_buf := string(buf[:n])
