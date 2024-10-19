@@ -49,6 +49,8 @@ func Execute(input_buf string) (string, error) {
 		cmd = &ReplConf{}
 	case "psync":
 		cmd = &Psync{}
+	case "wait":
+		cmd = &Wait{}
 	}
 
 	return (cmd).Run(command_slice[1:])
@@ -62,6 +64,7 @@ type Set struct{}
 type Get struct{}
 type ReplConf struct{}
 type Psync struct{}
+type Wait struct{}
 
 type Type interface {
 	Encode() string
@@ -72,6 +75,10 @@ type SimpleString struct {
 
 type BulkString struct {
 	Content *string
+}
+
+func (*Wait) Run(input []string) (string, error) {
+	return ":0\r\n", nil
 }
 
 func (*Psync) Run(input []string) (string, error) {
