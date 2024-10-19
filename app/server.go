@@ -248,11 +248,17 @@ func CallReplica(message string) {
 	// }
 	// defer conn.Close()
 	for _, slave := range slaves {
-		_, err := slave.Write([]byte(message))
+		sent := false
+		for !sent {
+			_, err := slave.Write([]byte(message))
 
-		if err != nil {
-			fmt.Println("Error sending message to Replica", err)
-			os.Exit(1)
+			if err != nil {
+				fmt.Println("Error sending message to Replica", err)
+				// os.Exit(1)
+				continue
+
+			}
+			sent = true
 
 		}
 
