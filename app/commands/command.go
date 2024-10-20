@@ -16,6 +16,7 @@ var DEFAULTROLE string = "master"
 var MASTER_REPLID string = "8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb"
 var MASTER_REPL_OFFSET int = 0
 var REPLICATION_SERVER_PORT string = ""
+var RELICATION_COUNT int = 0
 
 func clrfSplit(str string) []string {
 	command_slice := strings.Split(str, ClrfDelimeter)
@@ -78,7 +79,8 @@ type BulkString struct {
 }
 
 func (*Wait) Run(input []string) (string, error) {
-	return ":0\r\n", nil
+	msg := fmt.Sprintf(":%d\r\n", RELICATION_COUNT)
+	return msg, nil
 }
 
 func (*Psync) Run(input []string) (string, error) {

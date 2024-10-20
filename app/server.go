@@ -264,6 +264,7 @@ func handle_psync(input_buf string, conn net.Conn) {
 	fmt.Println("Received connection from:", remoteAddr)
 	remote_address := strings.Split(remoteAddr, ":")
 	slaves = append(slaves, conn)
+	commands.RELICATION_COUNT = len(slaves)
 
 	commands.REPLICATION_SERVER_PORT = remote_address[len(remote_address)-1]
 
